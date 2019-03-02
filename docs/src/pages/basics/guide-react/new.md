@@ -1,7 +1,3 @@
----
-id: 'guide-angular'
-title: 'Storybook for Angular'
----
 
 ## Automatic setup
 
@@ -84,6 +80,8 @@ That'll load stories in `../stories/index.js`. You can choose where to place sto
 > </details>
 
 ## Step 4: Storybook TypeScript configuration
+
+**Note:** You only need this if you are using Storybook `>= 4.0.0-alpha.23`.
 
 `@storybook/angular` is using [ForkTsCheckerWebpackPlugin](https://github.com/Realytics/fork-ts-checker-webpack-plugin) to boost the build performance. 
 This makes it necessary to create a `tsconfig.json` file at `.storybook/tsconfig.json` with the following content:

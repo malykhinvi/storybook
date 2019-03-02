@@ -3,56 +3,51 @@ id: 'guide-react'
 title: 'Storybook for React'
 ---
 
-You may have tried to use our quick start guide to setup your project for Storybook. If you want to set up Storybook manually, this is the guide for you.
+## Automatic setup
 
-This will also help you to understand how Storybook works.
-
-## Starter Guide React
-
-Storybook has its own Webpack setup and a dev server. Webpack setup is very similar to [Create React App](https://github.com/facebookincubator/create-react-app), but allows you to configure it as you want.
-
-In this guide, we will set up Storybook for your React project.
-
-## Table of contents
-
--   [Add @storybook/react](#add-storybookreact)
--   [Add react, react-dom, @babel/core, and babel-loader](#add-react-react-dom-babel-core-and-babel-loader)
--   [Create the config file](#create-the-config-file)
--   [Write your stories](#write-your-stories)
--   [Run your Storybook](#run-your-storybook)
-
-## Add @storybook/react
-
-First of all, you need to add `@storybook/react` to your project. To do that, run:
+You may have tried to use our quick start guide to setup your project for Storybook.
+If it failed because it couldn't detect you're using react, you could try forcing it to use react:
 
 ```sh
-npm i --save-dev @storybook/react
+npx -p @storybook/cli sb init --type react
 ```
 
-## Add react, react-dom, @babel/core, and babel-loader
+## Manual setup
+
+If you want to set up Storybook manually for your React project, this is the guide for you.
+
+## Step 1: Add dependencies
+
+### Add @storybook/react
+
+Add `@storybook/react` to your project. To do that, run:
+
+```sh
+npm install @storybook/react --save-dev
+```
+
+### Add react, react-dom, @babel/core, and babel-loader
 
 Make sure that you have `react`, `react-dom`, `@babel/core`, and `babel-loader` in your dependencies as well because we list these as a peer dependencies:
 
 ```sh
-npm i --save react react-dom
-npm i --save-dev @babel/core
-npm i --save-dev babel-loader
+npm install react react-dom --save
+npm install babel-loader @babel/core --save-dev 
 ```
+
+## Step 2: Add a npm script
 
 Then add the following NPM script to your `package.json` in order to start the storybook later in this guide:
 
 ```json
 {
   "scripts": {
-    "storybook": "start-storybook -p 9001 -c .storybook"
+    "storybook": "start-storybook"
   }
 }
 ```
 
-## Create the config file
-
-Storybook can be configured in several different ways. 
-That’s why we need a config directory. We've added a `-c` option to the above NPM script mentioning `.storybook` as the config directory.
+## Step 3: Create the config file
 
 For a basic Storybook configuration, the only thing you need to do is tell Storybook where to find stories.
 
@@ -69,13 +64,29 @@ function loadStories() {
 configure(loadStories, module);
 ```
 
-That'll load stories in `../stories/index.js`.
+That'll load stories in `../stories/index.js`. You can choose where to place stories, you can co-locate them with source files, or place them in an other directory.
 
-Just like that, you can load stories from wherever you want to.
+> Requiring all your stories becomes bothersome real quick, so you can use this to load all stories matching a glob.
+> 
+> <details>
+>   <summary>details</summary>
+> 
+> ```js
+> import { configure } from '@storybook/react';
+> 
+> function loadStories() {
+>   const req = require.context('../stories', true, /\.stories\.js$/);
+>   req.keys().forEach(filename => req(filename));
+> }
+> 
+> configure(loadStories, module);
+> ```
+> 
+> </details>
 
-## Write your stories
+## Step 4: Write your stories
 
-Now you can write some stories inside the `../stories/index.js` file, like this:
+Now create a `../stories/index.js` file, and write your first story like this:
 
 ```js
 import React from 'react';
@@ -86,17 +97,20 @@ storiesOf('Button', module)
   .add('with text', () => (
     <Button>Hello Button</Button>
   ))
-  .add('with some emoji', () => (
+  .add('with emoji', () => (
     <Button><span role="img" aria-label="so cool">😀 😎 👍 💯</span></Button>
   ));   
 ```
 
 Each story is a single state of your component. In the above case, there are two stories for the demo button component:
 
-1.  With text
-2.  With some emoji
+```plaintext
+Button
+  ├── with text
+  └── with emoji
+```
 
-## Run your Storybook
+## Finally: Run your Storybook
 
 Now everything is ready. Run your storybook with:
 
@@ -104,8 +118,6 @@ Now everything is ready. Run your storybook with:
 npm run storybook
 ```
 
-Then you can see all your stories, like this:
+Storybook should start, on a random open port in dev-mode.
 
-![Basic stories](../static/basic-stories.png)
-
-Now you can change components and write stories whenever you need to. You'll see the changes in Storybook immediately since it uses Webpack's hot module reloading.
+Now you can develop your components and write stories and see the changes in Storybook immediately since it uses Webpack's hot module reloading.

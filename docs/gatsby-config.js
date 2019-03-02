@@ -8,6 +8,13 @@ module.exports = {
     docSections: {
       basics: [
         '/basics/introduction/',
+        '/basics/writing-stories/',
+        '/basics/exporting-storybook/',
+        '/basics/faq/',
+        '/basics/community/',
+        '/basics/live-examples/',
+      ],
+      guides: [
         '/basics/quick-start-guide/',
         '/basics/slow-start-guide/',
         '/basics/guide-react/',
@@ -16,11 +23,7 @@ module.exports = {
         '/basics/guide-angular/',
         '/basics/guide-mithril/',
         '/basics/guide-ember/',
-        '/basics/writing-stories/',
-        '/basics/exporting-storybook/',
-        '/basics/faq/',
-        '/basics/community/',
-        '/basics/live-examples/',
+        '/basics/guide-riot/',
       ],
       configurations: [
         '/configurations/options-parameter/',

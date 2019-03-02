@@ -15,8 +15,16 @@ npx -p @storybook/cli sb init
 
 The tool inspects your `package.json` to determine which view layer you're using. If you want to develop HTML snippets in storybook, we can't determine that automatically. So to install storybook for HTML, use the `--type` flag to force that the HTML project type:
 
-```
+```sh
 npx -p @storybook/cli sb init --type html
+```
+
+It's also useful if our automatic detection fails.
+
+By default npx will use the latest version, if you want to try out an next version, you can use the following:
+
+```sh
+npx -p @storybook/cli@5.0.0-rc.6 sb init
 ```
 
 To setup a project manually, take a look at the [Slow Start Guide](/basics/slow-start-guide/).

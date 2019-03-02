@@ -3,89 +3,131 @@ id: 'guide-riot'
 title: 'Storybook for Riot'
 ---
 
-You may have tried to use our quick start guide to setup your project for Storybook. If you want to set up Storybook manually, this is the guide for you.
+## Automatic setup
 
-> This will also help you understand how Storybook works.
-
-## Starter Guide Riot
-
-Storybook has its own Webpack setup and a dev server.
-The Webpack setup is very similar to [tag-loader](https://github.com/riot/tag-loader), but allows you to [configure it however you want](/configurations/custom-webpack-config/).
-
-In this guide, we are trying to set up Storybook for your Riot project.
-
-## Table of contents
-
--   [Add @storybook/riot](#add-storybookriot)
--   [Add riot and babel-loader](#add-riot-and-babel-loader)
--   [Create the NPM script](#create-the-npm-script)
--   [Create the config file](#create-the-config-file)
--   [Write your stories](#write-your-stories)
--   [Run your Storybook](#run-your-storybook)
-
-## Add @storybook/riot
-
-First of all, you need to add `@storybook/riot` to your project. To do that, simply run:
+You may have tried to use our quick start guide to setup your project for Storybook.
+If it failed because it couldn't detect you're using riot, you could try forcing it to use riot:
 
 ```sh
-npm i --save-dev @storybook/riot
+npx -p @storybook/cli sb init --type riot
 ```
 
-## Add riot and babel-loader
+## Manual setup
 
-Make sure that you have `riot`, the `riot-compiler`, the `riot-tag-loader` and `babel-loader` in your dependencies as well because we list it as a peerDependency:
+If you want to set up Storybook manually for your Angular project, this is the guide for you.
+
+## Step 1: Add dependencies
+
+### Add @storybook/riot
+
+Add `@storybook/riot` to your project. To do that, run:
 
 ```sh
-npm i --save riot
-npm i --save-dev babel-core riot-compiler riot-tag-loader
+npm install @storybook/riot --save-dev
 ```
 
-## Create the NPM script
+### Add riot, @babel/core, and babel-loader
 
-Add the following NPM script to your `package.json` in order to start the storybook later in this guide:
+Make sure that you have `riot`, `@babel/core`, and `babel-loader` in your dependencies as well because we list these as a peer dependencies:
 
-    {
-      "scripts": {
-        "storybook": "start-storybook -p 9001 -c .storybook"
-      }
-    }
+```sh
+npm install riot babel-loader @babel/core --save-dev 
+```
 
-## Create the config file
+## Step 2: Add a npm script
 
-Storybook can be configured in several different ways.
-That’s why we need a config directory. We've added a `-c` option to the above NPM script mentioning `.storybook` as the config directory.
+Then add the following NPM script to your `package.json` in order to start the storybook later in this guide:
 
-There are 2 things you need to tell Storybook to do:
+```json
+{
+  "scripts": {
+    "storybook": "start-storybook"
+  }
+}
+```
 
-1.  Import and globally register with [`riot.mount()`](https://riot.js.org/api/#mounting) any global custom components just like you did with your project.
-2.  Require your stories.
+## Step 3: Create the config file
 
-Here's an example `.storybook/config.js` to get you started:
+For a basic Storybook configuration, the only thing you need to do is tell Storybook where to find stories.
 
-```js
+To do that, create a file at `.storybook/config.js` with the following content:
+
+```ts
 import { configure } from '@storybook/riot';
 
-// Import your globally available components.
-import '../src/stories/Button.tag'; 
-
 function loadStories() {
+  require('../stories/index.js');
   // You can require as many stories as you need.
-  require('../src/stories');
 }
 
 configure(loadStories, module);
 ```
 
-This example registered your custom `Button.tag` component, and loaded your Storybook stories defined in `../stories/index.js`.
+That'll load stories in `../stories/index.js`. You can choose where to place stories, you can co-locate them with source files, or place them in an other directory.
 
-All custom components can be registered before or after calling `configure()`.
+> Requiring all your stories becomes bothersome real quick, so you can use this to load all stories matching a glob.
+> 
+> <details>
+>   <summary>details</summary>
+> 
+> ```ts
+> import { configure } from '@storybook/riot';
+> 
+> function loadStories() {
+>   const req = require.context('../stories', true, /\.stories\.ts$/);
+>   req.keys().forEach(filename => req(filename));
+> }
+> 
+> configure(loadStories, module);
+> ```
+> 
+> </details>
 
-> This stories folder is just an example, you can load stories from wherever you want to.
-> We think stories are best located close to the source files.
 
-## Write your stories
+> Additionally this is the place where you can register global component.
+> 
+> <details>
+>   <summary>details</summary>
+> 
+> ```ts
+> import { configure } from '@storybook/riot';
+> 
+> // Import your globally available components.
+> import '../src/stories/Button.tag'; 
+> 
+> function loadStories() {
+>   require('../stories/index.js');
+>   // You can require as many stories as you need.
+}
+> 
+> configure(loadStories, module);
+> ```
+> 
+> </details>
 
-There are several ways to implement a story using either a text import or a component import
+## Step 4: Storybook TypeScript configuration
+
+`@storybook/riot` is using [ForkTsCheckerWebpackPlugin](https://github.com/Realytics/fork-ts-checker-webpack-plugin) to boost the build performance. 
+This makes it necessary to create a `tsconfig.json` file at `.storybook/tsconfig.json` with the following content:
+
+```json
+{
+  "extends": "../tsconfig.json",
+  "exclude": [
+    "../src/test.ts",
+    "../src/**/*.spec.ts",
+    "../projects/**/*.spec.ts"
+  ],
+  "include": [
+    "../src/**/*",
+    "../projects/**/*"
+  ]
+}
+```
+
+## Step 5: Write your stories
+
+Now create a `../stories/index.js` file, and write your first story like this:
 
 ```js
 import { tag, mount, storiesOf } from '@storybook/riot';
@@ -93,7 +135,7 @@ import SimpleTestRaw from './SimpleTest.txt'; //can be loaded as string if you p
 import './AnotherTest.tag';
 //if you need to import .tag files as text, just use the raw-loader instead of the riot-tag-loader
 
-storiesOf('Story|How to create a story', module)
+storiesOf('My Component', module)
   .add(
     'built with tag', // the template is compiled below
     () =>
@@ -133,13 +175,25 @@ storiesOf('Story|How to create a story', module)
   });
 ```
 
-## Run your Storybook
+Each story is a single state of your component. In the above case, there are two stories for the demo button component:
 
-Now everything is ready. Simply run your storybook with:
+```plaintext
+My Component
+  ├── built with tag
+  ├── built as string
+  ├── bubuilt from raw import
+  ├── built from tags and scenario
+  └── built from the precompilation
+```
+
+## Finally: Run your Storybook
+
+Now everything is ready. Run your storybook with:
 
 ```sh
 npm run storybook
 ```
 
-Now you can change components and write stories whenever you need to.
-You'll get those changes into Storybook in a snap with the help of Webpack's HMR API.
+Storybook should start, on a random open port in dev-mode.
+
+Now you can develop your components and write stories and see the changes in Storybook immediately since it uses Webpack's hot module reloading.

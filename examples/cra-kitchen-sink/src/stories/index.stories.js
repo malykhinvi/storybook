@@ -1,3 +1,4 @@
+import { text, withKnobs } from '@storybook/addon-knobs';
 import React from 'react';
 import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
@@ -24,6 +25,7 @@ const InfoButton = () => (
 );
 
 storiesOf('Button', module)
+  .addDecorator(withKnobs)
   .add('with text', () => <Button onClick={action('clicked')}>Hello Button</Button>, {
     options: { selectedPanel: 'storybook/actions/panel' },
   })
@@ -49,4 +51,6 @@ storiesOf('Button', module)
       notes: 'Composition: Info(Notes())',
       options: { selectedPanel: 'storybook/info/panel' },
     }
-  );
+  )
+  .add('with knobs', () => <Button>{text('label', 'default label')}</Button>)
+  .add('without knobs', () => <Button>static label</Button>);
